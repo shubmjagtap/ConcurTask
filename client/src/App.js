@@ -152,7 +152,7 @@ class App extends Component {
               <div className="">
                 <button onClick={this.createItem} className="btn btn-primary">
                   Add task
-                    </button>
+                </button>
               </div>
               {this.renderTabList()}
               <ul className="list-group list-group-flush">
