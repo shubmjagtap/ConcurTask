@@ -24,8 +24,9 @@ class App extends Component {
  
   refreshList = () => {
     axios   //Axios to send and receive HTTP requests
-      .get("http://localhost:8000/api/tasks/")
-      .then(res => this.setState({ taskList: res.data }))
+      .get("http://localhost:8081/tasks")
+      //.then(res => this.setState({ taskList: res.data }))
+      .then(res => console.log(res))
       .catch(err => console.log(err));
   };
 
@@ -109,21 +110,25 @@ class App extends Component {
     if (item.id) {
       // if old post to edit and submit
       axios
-        .put(`http://localhost:8000/api/tasks/${item.id}/`, item)
-        .then(res => this.refreshList());
+        .post(`http://localhost:8081/edit`, item)
+        // .then(res => this.refreshList());
+        .then(res => console.log(res));
       return;
     }
+    console.log("Here");
     // if new post to submit
     axios
-      .post("http://localhost:8000/api/tasks/", item)
-      .then(res => this.refreshList());
+      .post("http://localhost:8081/add", item)
+      // .then(res => this.refreshList());
+      .then(res => console.log(res));
   };
 
   // Delete item
   handleDelete = item => {
     axios
-      .delete(`http://localhost:8000/api/tasks/${item.id}/`)
-      .then(res => this.refreshList());
+      .post(`http://localhost:8081/delete`)
+      // .then(res => this.refreshList());
+      .then(res => console.log(res));
   };
   // handleDelete = item => {//add this after modal creation
   //   alert("delete" + JSON.stringify(item));//add this after modal creation
