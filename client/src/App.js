@@ -1,124 +1,175 @@
-import logo from './logo.svg';
-import React, {Component} from 'react';
-import './App.css';
+import React, { Component } from "react";
+import Modal from "./components/Modal";
+import axios from 'axios';  
 
-const tasks = [
-  {
-    id: 1,
-    title: "Order Release",
-    description: "Checkout customers and release",
-    completed: true
-  },
-  {
-    id: 2,
-    title: "Restock Shelves",
-    description: "Refill shelves with products",
-    completed: false
-  },
-  {
-    id: 3,
-    title: "Customer Support",
-    description: "Assist customers with inquiries",
-    completed: false
-  },
-  {
-    id: 4,
-    title: "Inventory Check",
-    description: "Count and verify inventory",
-    completed: true
-  }
-];
-
-// Define a class component named App
 class App extends Component {
-
-  // Constructor method - called when an instance of the component is created
   constructor(props) {
-    // Call the constructor of the parent class (Component)
     super(props);
-
-    // Define the initial state of the component
     this.state = {
-      // Set the initial value of viewCompleted property in state to false
       viewCompleted: false,
-      // Set the initial value of taskList property in state to an array of tasks (presumably defined elsewhere)
-      taskList: tasks
+      activeItem: {
+        title: "",
+        description: "",
+        completed: false
+      },
+      taskList: []
     };
   }
 
-  // A method to control the display of completed tasks
-  displayCompleted = status => {
-    // If the provided status is truthy
-    if (status) {
-      // Update the state using the setStatus method (should be corrected to setState)
-      return this.setStatus({ viewCompleted: true });
-    }
-    // If the provided status is falsy
-    return this.setStatus({ viewCompleted: false });
+  // Add componentDidMount()
+  componentDidMount() {
+    this.refreshList();
   }
 
-  // This function returns a JSX element that represents a set of tabs for toggling between completed and incomplete tasks.
+ 
+  refreshList = () => {
+    axios   //Axios to send and receive HTTP requests
+      .get("http://localhost:8000/api/tasks/")
+      .then(res => this.setState({ taskList: res.data }))
+      .catch(err => console.log(err));
+  };
+
+
+  displayCompleted = status => {
+    if (status) {
+      return this.setState({ viewCompleted: true });
+    }
+    return this.setState({ viewCompleted: false });
+  };
+
+
   renderTabList = () => {
     return (
-      <div className='my-5 tab-list'>
-        {/* Tab for showing completed tasks */}
+      <div className="my-5 tab-list">
         <span
-          onClick={() => this.displayCompleted(true)}  
-          className={this.state.viewCompleted ? "active" : ""}  
+          onClick={() => this.displayCompleted(true)}
+          className={this.state.viewCompleted ? "active" : ""}
         >
-          Completed
-        </span>
-
-        {/* Tab for showing incomplete tasks */}
+          completed
+            </span>
         <span
-          onClick={() => this.displayCompleted(false)}  
-          className={this.state.viewCompleted ? "" : "active"}  
+          onClick={() => this.displayCompleted(false)}
+          className={this.state.viewCompleted ? "" : "active"}
         >
-          Incomplete
-        </span>
+          Incompleted
+            </span>
       </div>
     );
-  }
+  };
 
-  // Filters tasks based on completed status and stores them in newItems array.
+  // Main variable to render items on the screen
   renderItems = () => {
-    const { viewCompleted } = this.state;  // Get whether to show completed or incomplete tasks
+    const { viewCompleted } = this.state;
     const newItems = this.state.taskList.filter(
-      item => item.completed == viewCompleted  // Filter tasks based on viewCompleted
+      item => item.completed === viewCompleted
     );
     return newItems.map(item => (
-      <li key={item.id} className='list-group-item d-flex justify-content-between align-items-center'>
-        <span className={`todo-title mr-2 ${this.state.viewCompleted ? "completed-todo" : ""}`} title={item.title} >
+      <li
+        key={item.id}
+        className="list-group-item d-flex justify-content-between align-items-center"
+      >
+        <span
+          className={`todo-title mr-2 ${this.state.viewCompleted ? "completed-todo" : ""
+            }`}
+          title={item.description}
+        >
           {item.title}
         </span>
         <span>
-          <button className='btn btn-info mr-2'>Edit</button>
-          <button className='btn btn-info mr-2'>Delete</button>
+          <button
+            onClick={() => this.editItem(item)}
+            className="btn btn-secondary mr-2"
+          >
+            Edit
+          </button>
+          <button
+            onClick={() => this.handleDelete(item)}
+            className="btn btn-danger"
+          >
+            Delete
+          </button>
         </span>
       </li>
-    ))
+    ));
+  };
+  // ///////////////////////////////////////////////////////////
+
+  ////add this after modal creation
+  toggle = () => {//add this after modal creation
+    this.setState({ modal: !this.state.modal });//add this after modal creation
+  };
+  // handleSubmit = item => {//add this after modal creation
+  //   this.toggle();//add this after modal creation
+  //   alert("save" + JSON.stringify(item));//add this after modal creation
+  // };
+
+  // Submit an item
+  handleSubmit = item => {
+    this.toggle();
+    if (item.id) {
+      // if old post to edit and submit
+      axios
+        .put(`http://localhost:8000/api/tasks/${item.id}/`, item)
+        .then(res => this.refreshList());
+      return;
+    }
+    // if new post to submit
+    axios
+      .post("http://localhost:8000/api/tasks/", item)
+      .then(res => this.refreshList());
   };
 
+  // Delete item
+  handleDelete = item => {
+    axios
+      .delete(`http://localhost:8000/api/tasks/${item.id}/`)
+      .then(res => this.refreshList());
+  };
+  // handleDelete = item => {//add this after modal creation
+  //   alert("delete" + JSON.stringify(item));//add this after modal creation
+  // };
+
+  // Create item
+  createItem = () => {
+    const item = { title: "", description: "", completed: false };
+    this.setState({ activeItem: item, modal: !this.state.modal });
+  };
+
+  //Edit item
+  editItem = item => {
+    this.setState({ activeItem: item, modal: !this.state.modal });
+  };
+
+
+  // -I- Start by visual effects to viewer
   render() {
     return (
-      <main className='context'>
-        <h1 className='text-black text-uppercase text-center my-4'>ConcurTask</h1>
-        <h1 className='row'>
-          <div className='col-md-6 col-sma-10 mx-auto p-0'>
-            <div className='card p-3'>
-              <div>
-                <button className='btn btn-warning'>Add Task</button>
+      <main className="content">
+        <h1 className="text-black text-uppercase text-center my-4">Task Manager</h1>
+        <div className="row ">
+          <div className="col-md-6 col-sm-10 mx-auto p-0">
+            <div className="card p-3">
+              <div className="">
+                <button onClick={this.createItem} className="btn btn-primary">
+                  Add task
+                    </button>
               </div>
               {this.renderTabList()}
-              <ul className='list-group list-group-flush'>
+              <ul className="list-group list-group-flush">
                 {this.renderItems()}
               </ul>
             </div>
           </div>
-        </h1>
+        </div>
+        {this.state.modal ? (
+          <Modal
+            activeItem={this.state.activeItem}
+            toggle={this.toggle}
+            onSave={this.handleSubmit}
+          />
+        ) : null}
       </main>
-    )
-  } 
+    );
+  }
 }
-
 export default App;
