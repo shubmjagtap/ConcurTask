@@ -2,23 +2,6 @@ import React, { Component } from "react";
 import Modal from "./components/Modal";
 import axios from 'axios';  
 
-// Create a mock task data array
-const taskData = [
-  {
-    id: 1,
-    title: "Task 1",
-    description: "Description for Task 1",
-    completed: false
-  },
-  {
-    id: 2,
-    title: "Task 2",
-    description: "Description for Task 2",
-    completed: true
-  },
-  // Add more task objects as needed
-];
-
 class App extends Component {
   constructor(props) {
     super(props);
@@ -27,7 +10,8 @@ class App extends Component {
       activeItem: {
         title: "",
         description: "",
-        completed: false
+        completed: false,
+        editMode: false
       },
       taskList: []
     };
@@ -42,8 +26,8 @@ class App extends Component {
   refreshList = () => {
     axios   //Axios to send and receive HTTP requests
       .get("http://localhost:8081/tasks")
-      .then(res => this.setState({ taskList: taskData }))
-      // .then(res => console.log(res))
+      .then(res => this.setState({ taskList: res.data }))
+      //.then(res => console.log(res.data))
       .catch(err => console.log(err));
   };
 
@@ -123,31 +107,29 @@ class App extends Component {
 
   // Submit an item
   handleSubmit = item => {
-    console.log("Priniting before ...");
-    console.log(item);
-    console.log("Priniting after ...");
     this.toggle();
-    if (item.id) {
+    console.log("Insite handleSubmit ...");
+    if (item.editMode) {
+      console.log("Insite handleSubmit & if condition ...");
       // if old post to edit and submit
       axios
         .post(`http://localhost:8081/edit`, item)
-        // .then(res => this.refreshList());
-        .then(res => console.log(res));
+        .then(res => this.refreshList());
+      console.log("Insite handleSubmit & if condition exiting  ...");
       return;
     }
+    console.log("Insite handleSubmit & outside if condition ...");
     // if new post to submit
     axios
       .post("http://localhost:8081/add", item)
-      // .then(res => this.refreshList());
-      .then(res => console.log(res));
+      .then(res => this.refreshList());
   };
 
   // Delete item
   handleDelete = item => {
     axios
-      .post(`http://localhost:8081/delete`)
-      // .then(res => this.refreshList());
-      .then(res => console.log(res));
+      .post(`http://localhost:8081/delete`,item)
+      .then(res => this.refreshList());
   };
   // handleDelete = item => {//add this after modal creation
   //   alert("delete" + JSON.stringify(item));//add this after modal creation
@@ -155,12 +137,13 @@ class App extends Component {
 
   // Create item
   createItem = () => {
-    const item = { title: "", description: "", completed: false };
+    const item = { title: "", description: "", completed: false, editMode: false };
     this.setState({ activeItem: item, modal: !this.state.modal });
   };
 
   //Edit item
   editItem = item => {
+    item.editMode = true;
     this.setState({ activeItem: item, modal: !this.state.modal });
   };
 
