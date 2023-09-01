@@ -2,6 +2,23 @@ import React, { Component } from "react";
 import Modal from "./components/Modal";
 import axios from 'axios';  
 
+// Create a mock task data array
+const taskData = [
+  {
+    id: 1,
+    title: "Task 1",
+    description: "Description for Task 1",
+    completed: false
+  },
+  {
+    id: 2,
+    title: "Task 2",
+    description: "Description for Task 2",
+    completed: true
+  },
+  // Add more task objects as needed
+];
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -25,8 +42,8 @@ class App extends Component {
   refreshList = () => {
     axios   //Axios to send and receive HTTP requests
       .get("http://localhost:8081/tasks")
-      //.then(res => this.setState({ taskList: res.data }))
-      .then(res => console.log(res))
+      .then(res => this.setState({ taskList: taskData }))
+      // .then(res => console.log(res))
       .catch(err => console.log(err));
   };
 
@@ -106,6 +123,9 @@ class App extends Component {
 
   // Submit an item
   handleSubmit = item => {
+    console.log("Priniting before ...");
+    console.log(item);
+    console.log("Priniting after ...");
     this.toggle();
     if (item.id) {
       // if old post to edit and submit
@@ -115,7 +135,6 @@ class App extends Component {
         .then(res => console.log(res));
       return;
     }
-    console.log("Here");
     // if new post to submit
     axios
       .post("http://localhost:8081/add", item)
