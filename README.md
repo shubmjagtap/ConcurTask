@@ -45,10 +45,27 @@ Step-by-step instructions on how to install and configure your project. You can 
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/shubmjagtap/ConcurTask.git
 
 # Change directory to the project folder
-cd project-folder
+cd ConcurTask
 
-# Install dependencies
+# Change directory to frontend folder
+cd frontend
+
+# Install all dependencies
 npm install
+
+# Start react App
+npm start
+
+# Change back to previous directory
+cd ..
+
+# Change to server folder
+cd server
+
+# Start golang server
+go run main.go
+
+
