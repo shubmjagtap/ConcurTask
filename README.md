@@ -2,18 +2,6 @@
 
 Brief project description or tagline.
 
-## Table of Contents
-
-- [Overview](#overview)
-- [Features](#features)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-- [Usage](#usage)
-- [Configuration](#configuration)
-- [Contributing](#contributing)
-- [License](#license)
-
 ## Overview
 
 The Task Manager project combines a React.js frontend with a Go Gin backend to offer a simple yet effective way to manage tasks. With features like task creation, deletion, and editing, it enhances productivity and keeps your to-do list organized for optimal efficiency. Whether you're an individual or part of a team, this tool helps streamline your daily workflow.
